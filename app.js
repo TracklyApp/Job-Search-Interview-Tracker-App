@@ -18,7 +18,7 @@
     contacts: ['Contacts', 'Build a lightweight networking CRM.'],
     offers: ['Offers', 'Compare compensation and overall fit.'],
     analytics: ['Analytics', 'Understand what is working in your job search.'],
-    settings: ['Settings', 'Activation, backup and appearance.']
+    settings: ['Settings', 'Profile, activation, backup and appearance.']
   };
 
   const now = new Date();
@@ -30,8 +30,9 @@
   };
 
   const sampleState = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     activated: false,
+    profile: { fullName:'', targetTitle:'', location:'', email:'', linkedin:'', workType:'Remote', targetSalary:'', currency:'EUR' },
     demoOps: 0,
     applications: [
       { id:'a1', role:'Product Operations Specialist', company:'Northstar Labs', status:'Interview', priority:'High', workStyle:'Remote', location:'Remote — Europe', salaryMin:52000, salaryMax:68000, currency:'EUR', source:'LinkedIn', appliedDate:addDays(-8), nextStepDate:addDays(1), jobUrl:'', scoreRole:5, scoreSalary:4, scoreRemote:5, scoreGrowth:4, scoreBenefits:4, scoreCompany:5, notes:'Strong role fit. Prepare examples about process improvement and cross-functional work.', isDemo:true, createdAt:Date.now()-800000 },
@@ -127,7 +128,8 @@
     const merged = {
       ...structuredClone(sampleState),
       ...saved,
-      schemaVersion: 2,
+      schemaVersion: 3,
+      profile: { ...structuredClone(sampleState.profile), ...(saved.profile && typeof saved.profile === 'object' ? structuredClone(saved.profile) : {}) },
       applications: Array.isArray(saved.applications) ? structuredClone(saved.applications) : [],
       interviews: Array.isArray(saved.interviews) ? structuredClone(saved.interviews) : [],
       followups: Array.isArray(saved.followups) ? structuredClone(saved.followups) : [],
@@ -273,6 +275,7 @@
     $('#offerForm').addEventListener('submit', handleOfferSubmit);
     $$('.score-input').forEach(input => input.addEventListener('input', updateMatchPreview));
     $('#activationForm').addEventListener('submit', handleActivation);
+    $('#profileForm').addEventListener('submit', handleProfileSubmit);
   }
 
   function handleApplicationSubmit(e) {
@@ -323,6 +326,28 @@
     commitMutation('Offer saved');
   }
 
+  function handleProfileSubmit(e) {
+    e.preventDefault();
+    const data = formObject(e.currentTarget);
+    state.profile = {
+      ...structuredClone(sampleState.profile),
+      ...state.profile,
+      ...data,
+      fullName: String(data.fullName || '').trim(),
+      targetTitle: String(data.targetTitle || '').trim(),
+      location: String(data.location || '').trim(),
+      email: String(data.email || '').trim(),
+      linkedin: String(data.linkedin || '').trim(),
+      workType: data.workType || 'Remote',
+      targetSalary: numOrBlank(data.targetSalary),
+      currency: data.currency || 'EUR'
+    };
+    persist();
+    renderProfile();
+    renderDashboard();
+    toast('Profile saved', 'success');
+  }
+
   async function handleActivation(e) {
     e.preventDefault();
     const code = String(new FormData(e.currentTarget).get('code') || '').trim().toUpperCase();
@@ -356,6 +381,15 @@
 
   function bindSettings() {
     $('#exportBackupBtn').addEventListener('click', exportBackup);
+    $('#resetProfileBtn').addEventListener('click', () => confirmDialog(
+      'Reset profile?',
+      'This clears only your profile details. Applications, interviews and other tracker data stay untouched.',
+      () => {
+        state.profile = structuredClone(sampleState.profile);
+        persist(); renderAll(); toast('Profile reset', 'success');
+      },
+      'Reset profile'
+    ));
     $('#importBackupInput').addEventListener('change', importBackup);
     $('#clearDemoBtn').addEventListener('click', () => confirmDialog(
       'Clear sample data?',
@@ -432,6 +466,7 @@
   function renderAll() {
     refreshApplicationSelects();
     renderDemo();
+    renderProfile();
     renderDashboard();
     renderApplications();
     renderPipeline();
@@ -455,7 +490,38 @@
     }
   }
 
+  function renderProfile() {
+    const profile = { ...sampleState.profile, ...(state.profile || {}) };
+    const fullName = String(profile.fullName || '').trim();
+    const targetTitle = String(profile.targetTitle || '').trim();
+    const displayName = fullName || 'My Job Search';
+    const initials = fullName
+      ? fullName.split(/\s+/).filter(Boolean).slice(0,2).map(part => part.charAt(0).toUpperCase()).join('')
+      : 'ME';
+
+    const sidebarName = $('#sidebarProfileName');
+    const sidebarSubtitle = $('#sidebarProfileSubtitle');
+    const sidebarAvatar = $('#sidebarProfileAvatar');
+    const settingsAvatar = $('#settingsProfileAvatar');
+    if (sidebarName) sidebarName.textContent = displayName;
+    if (sidebarSubtitle) sidebarSubtitle.textContent = targetTitle || 'Personal Workspace';
+    if (sidebarAvatar) sidebarAvatar.textContent = initials;
+    if (settingsAvatar) settingsAvatar.textContent = initials;
+
+    const form = $('#profileForm');
+    if (form) {
+      ['fullName','targetTitle','location','email','linkedin','workType','targetSalary','currency'].forEach(name => {
+        if (form.elements[name]) form.elements[name].value = profile[name] ?? '';
+      });
+    }
+  }
+
   function renderDashboard() {
+    const profile = { ...sampleState.profile, ...(state.profile || {}) };
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'GOOD MORNING' : hour < 18 ? 'GOOD AFTERNOON' : 'GOOD EVENING';
+    const firstName = String(profile.fullName || '').trim().split(/\s+/)[0] || '';
+    $('#dashboardGreeting').textContent = firstName ? `${greeting}, ${firstName.toUpperCase()}` : greeting;
     const apps = state.applications;
     const active = apps.filter(a => !['Rejected','Withdrawn','Hired'].includes(a.status));
     const interviewStageCount = apps.filter(a => ['Interview','Final Interview'].includes(a.status)).length;
@@ -470,9 +536,6 @@
     const reachedInterview = apps.filter(a => ['Interview','Final Interview','Offer','Hired'].includes(a.status)).length;
     const interviewRate = apps.length ? Math.round(reachedInterview / apps.length * 100) : 0;
 
-    const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'GOOD MORNING' : hour < 18 ? 'GOOD AFTERNOON' : 'GOOD EVENING';
-    $('#dashboardGreeting').textContent = greeting;
     const momentum = Math.max(0, Math.min(100, 28 + Math.min(28,recentApps*7) + Math.min(24,nextWeekInterviews*8) + Math.min(20,offers*10) - Math.min(20,overdueFollowups*5)));
     $('#momentumScore').textContent = momentum;
     $('#momentumRing').style.setProperty('--momentum', momentum);
@@ -732,7 +795,7 @@
   }
 
   function exportBackup() {
-    const backup={ schemaVersion:2, exportedAt:new Date().toISOString(), data:{ applications:state.applications, interviews:state.interviews, followups:state.followups, companies:state.companies, contacts:state.contacts, offers:state.offers } };
+    const backup={ schemaVersion:3, exportedAt:new Date().toISOString(), data:{ profile:state.profile, applications:state.applications, interviews:state.interviews, followups:state.followups, companies:state.companies, contacts:state.contacts, offers:state.offers } };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`jobtrack-backup-${isoToday}.json`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),500); toast('Backup exported','success');
   }
 
@@ -743,6 +806,7 @@
       try{
         const parsed=JSON.parse(reader.result); const data=parsed.data||parsed;
         if(!Array.isArray(data.applications)) throw new Error('Invalid backup');
+        state.profile = data.profile && typeof data.profile === 'object' ? { ...structuredClone(sampleState.profile), ...data.profile } : state.profile;
         ['applications','interviews','followups','companies','contacts','offers'].forEach(k=>state[k]=Array.isArray(data[k])?data[k]:[]);
         persist(); renderAll(); toast('Backup restored','success');
       }catch(err){ toast('Could not restore this backup file.','error'); }

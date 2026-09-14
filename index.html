@@ -34,6 +34,14 @@
       </nav>
 
       <div class="sidebar-bottom">
+        <button class="sidebar-profile" id="sidebarProfile" data-nav="settings" type="button" aria-label="Open profile settings">
+          <span class="profile-avatar" id="sidebarProfileAvatar">ME</span>
+          <span class="profile-copy">
+            <strong id="sidebarProfileName">My Job Search</strong>
+            <small id="sidebarProfileSubtitle">Personal Workspace</small>
+          </span>
+          <span class="profile-chevron" aria-hidden="true">›</span>
+        </button>
         <div class="demo-card" id="demoCard">
           <div class="demo-row"><span>Demo usage</span><strong id="demoCounter">Demo 0 / 20</strong></div>
           <div class="progress"><span id="demoProgress"></span></div>
@@ -186,6 +194,30 @@
 
         <div class="view" id="view-settings">
           <div class="settings-grid">
+            <div class="card settings-card profile-settings-card">
+              <div class="profile-settings-head">
+                <div class="profile-settings-avatar" id="settingsProfileAvatar">ME</div>
+                <div>
+                  <span class="eyebrow">PROFILE</span>
+                  <h3>Your job search profile</h3>
+                  <p>Personalize JobTrack so your workspace, dashboard and job preferences feel like your own. Profile details stay in this browser.</p>
+                </div>
+              </div>
+              <form id="profileForm" class="form-grid profile-form-grid">
+                <label>Full name<input name="fullName" autocomplete="name" placeholder="e.g. Alex Morgan" /></label>
+                <label>Target job title<input name="targetTitle" placeholder="e.g. Product Manager" /></label>
+                <label>Location<input name="location" autocomplete="address-level2" placeholder="e.g. London, UK" /></label>
+                <label>Email<input name="email" type="email" autocomplete="email" placeholder="name@example.com" /></label>
+                <label class="span-2">LinkedIn URL<input name="linkedin" type="url" placeholder="https://www.linkedin.com/in/..." /></label>
+                <label>Preferred work type<select name="workType"><option>Remote</option><option>Hybrid</option><option>On-site</option><option>Flexible</option></select></label>
+                <label>Target salary<input name="targetSalary" type="number" min="0" step="100" placeholder="60000" /></label>
+                <label>Currency<select name="currency"><option>EUR</option><option>USD</option><option>GBP</option><option>RON</option><option>CAD</option><option>AUD</option></select></label>
+                <div class="span-2 profile-form-actions">
+                  <button class="btn btn-primary" type="submit">Save profile</button>
+                  <button class="btn btn-secondary" id="resetProfileBtn" type="button">Reset profile</button>
+                </div>
+              </form>
+            </div>
             <div class="card settings-card">
               <span class="eyebrow">APP ACCESS</span><h3>Activation</h3>
               <p id="activationStatusText">You are using the demo. You can make up to 20 changes.</p>
