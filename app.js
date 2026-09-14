@@ -30,9 +30,9 @@
   };
 
   const sampleState = {
-    schemaVersion: 3,
+    schemaVersion: 4,
     activated: false,
-    profile: { fullName:'', targetTitle:'', location:'', email:'', linkedin:'', workType:'Remote', targetSalary:'', currency:'EUR' },
+    profile: { fullName:'', targetTitle:'', location:'', email:'', linkedin:'', workType:'Remote', targetSalary:'', currency:'USD' },
     demoOps: 0,
     applications: [
       { id:'a1', role:'Product Operations Specialist', company:'Northstar Labs', status:'Interview', priority:'High', workStyle:'Remote', location:'Remote — Europe', salaryMin:52000, salaryMax:68000, currency:'EUR', source:'LinkedIn', appliedDate:addDays(-8), nextStepDate:addDays(1), jobUrl:'', scoreRole:5, scoreSalary:4, scoreRemote:5, scoreGrowth:4, scoreBenefits:4, scoreCompany:5, notes:'Strong role fit. Prepare examples about process improvement and cross-functional work.', isDemo:true, createdAt:Date.now()-800000 },
@@ -128,7 +128,7 @@
     const merged = {
       ...structuredClone(sampleState),
       ...saved,
-      schemaVersion: 3,
+      schemaVersion: 4,
       profile: { ...structuredClone(sampleState.profile), ...(saved.profile && typeof saved.profile === 'object' ? structuredClone(saved.profile) : {}) },
       applications: Array.isArray(saved.applications) ? structuredClone(saved.applications) : [],
       interviews: Array.isArray(saved.interviews) ? structuredClone(saved.interviews) : [],
@@ -140,6 +140,10 @@
     merged.demoOps = Math.max(0, Number(merged.demoOps) || 0);
     merged.activated = Boolean(merged.activated);
     merged.demoCleared = Boolean(saved.demoCleared);
+    const savedSchema = Number(saved.schemaVersion || 0);
+    const savedProfile = saved.profile && typeof saved.profile === 'object' ? saved.profile : {};
+    const profileWasUntouched = !String(savedProfile.fullName || '').trim() && !String(savedProfile.targetTitle || '').trim() && !String(savedProfile.location || '').trim() && !String(savedProfile.email || '').trim() && !String(savedProfile.linkedin || '').trim() && (savedProfile.targetSalary === '' || savedProfile.targetSalary === undefined || savedProfile.targetSalary === null);
+    if (savedSchema < 4 && profileWasUntouched && String(merged.profile.currency || '').toUpperCase() === 'EUR') merged.profile.currency = 'USD';
     if (!merged.demoCleared) {
       ['applications','interviews','followups','companies','contacts','offers'].forEach(key => {
         const existingIds = new Set(merged[key].map(item => item.id));
@@ -235,7 +239,7 @@
       form.elements.status.value = 'Saved';
       form.elements.priority.value = 'Medium';
       form.elements.workStyle.value = 'Remote';
-      form.elements.currency.value = 'EUR';
+      form.elements.currency.value = 'USD';
       form.elements.source.value = 'LinkedIn';
       ['scoreRole','scoreSalary','scoreRemote','scoreGrowth','scoreCompany'].forEach(name => form.elements[name].value = 4);
       form.elements.scoreBenefits.value = 3;
@@ -257,7 +261,7 @@
     }
     if (id === 'companyModal') { const form=$('#companyForm'); form.reset(); form.elements.id.value=''; if(record) fillForm(form, record); }
     if (id === 'contactModal') { const form=$('#contactForm'); form.reset(); form.elements.id.value=''; if(record) fillForm(form, record); }
-    if (id === 'offerModal') { const form=$('#offerForm'); form.reset(); form.elements.id.value=''; form.elements.currency.value='EUR'; form.elements.score.value='8'; if(record) fillForm(form, record); }
+    if (id === 'offerModal') { const form=$('#offerForm'); form.reset(); form.elements.id.value=''; form.elements.currency.value='USD'; form.elements.score.value='8'; if(record) fillForm(form, record); }
   }
 
   function fillForm(form, record) {
@@ -288,6 +292,7 @@
       id,
       salaryMin: numOrBlank(data.salaryMin),
       salaryMax: numOrBlank(data.salaryMax),
+      currency: normalizeCurrency(data.currency),
       scoreRole: Number(data.scoreRole), scoreSalary:Number(data.scoreSalary), scoreRemote:Number(data.scoreRemote),
       scoreGrowth:Number(data.scoreGrowth), scoreBenefits:Number(data.scoreBenefits), scoreCompany:Number(data.scoreCompany),
       isDemo:false,
@@ -317,6 +322,7 @@
     const data = formObject(e.currentTarget);
     data.id = data.id || uid('o');
     data.salary = numOrBlank(data.salary);
+    data.currency = normalizeCurrency(data.currency);
     data.score = Number(data.score || 0);
     data.isDemo = false;
     upsert(state.offers, data);
@@ -340,7 +346,7 @@
       linkedin: String(data.linkedin || '').trim(),
       workType: data.workType || 'Remote',
       targetSalary: numOrBlank(data.targetSalary),
-      currency: data.currency || 'EUR'
+      currency: normalizeCurrency(data.currency)
     };
     persist();
     renderProfile();
@@ -711,6 +717,7 @@
   }
 
   function formObject(form) { return Object.fromEntries(new FormData(form).entries()); }
+  function normalizeCurrency(value) { const v=String(value || 'USD').trim(); if(!v) return 'USD'; return /^[A-Za-z]{3}$/.test(v) ? v.toUpperCase() : v; }
   function upsert(arr, record) { const i=arr.findIndex(x=>x.id===record.id); if(i>=0) arr[i]={...arr[i],...record}; else arr.unshift(record); }
   function uid(prefix='r') { return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}`; }
   function numOrBlank(v) { return v===''||v===null||v===undefined?'':Number(v); }
@@ -795,7 +802,7 @@
   }
 
   function exportBackup() {
-    const backup={ schemaVersion:3, exportedAt:new Date().toISOString(), data:{ profile:state.profile, applications:state.applications, interviews:state.interviews, followups:state.followups, companies:state.companies, contacts:state.contacts, offers:state.offers } };
+    const backup={ schemaVersion:4, exportedAt:new Date().toISOString(), data:{ profile:state.profile, applications:state.applications, interviews:state.interviews, followups:state.followups, companies:state.companies, contacts:state.contacts, offers:state.offers } };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`jobtrack-backup-${isoToday}.json`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),500); toast('Backup exported','success');
   }
 
@@ -824,7 +831,7 @@
   }
 
   function toISODate(d) { const local=new Date(d.getTime()-d.getTimezoneOffset()*60000); return local.toISOString().slice(0,10); }
-  function formatMoney(value,currency='EUR') { if(value===''||value===null||value===undefined) return 'Salary not set'; try{return new Intl.NumberFormat(undefined,{style:'currency',currency:currency||'EUR',maximumFractionDigits:0}).format(Number(value));}catch{return `${value} ${currency}`;} }
+  function formatMoney(value,currency='USD') { if(value===''||value===null||value===undefined) return 'Salary not set'; try{return new Intl.NumberFormat(undefined,{style:'currency',currency:currency||'USD',maximumFractionDigits:0}).format(Number(value));}catch{return `${value} ${currency}`;} }
   function emptyMini(text){ return `<div class="empty-state" style="padding:18px 8px">${escapeHTML(text)}</div>`; }
   function barRow(label,count,width){ return `<div class="bar-item"><span>${escapeHTML(label)}</span><div class="bar-track"><span style="width:${Math.max(4,width)}%"></span></div><strong>${count}</strong></div>`; }
   function escapeHTML(value){ return String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch])); }

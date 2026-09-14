@@ -211,7 +211,7 @@
                 <label class="span-2">LinkedIn URL<input name="linkedin" type="url" placeholder="https://www.linkedin.com/in/..." /></label>
                 <label>Preferred work type<select name="workType"><option>Remote</option><option>Hybrid</option><option>On-site</option><option>Flexible</option></select></label>
                 <label>Target salary<input name="targetSalary" type="number" min="0" step="100" placeholder="60000" /></label>
-                <label>Currency<select name="currency"><option>EUR</option><option>USD</option><option>GBP</option><option>RON</option><option>CAD</option><option>AUD</option></select></label>
+                <label>Currency<input name="currency" list="currencySuggestions" maxlength="12" placeholder="USD" /></label>
                 <div class="span-2 profile-form-actions">
                   <button class="btn btn-primary" type="submit">Save profile</button>
                   <button class="btn btn-secondary" id="resetProfileBtn" type="button">Reset profile</button>
@@ -250,6 +250,19 @@
     </main>
   </div>
 
+
+  <datalist id="currencySuggestions">
+    <option value="USD"></option>
+    <option value="EUR"></option>
+    <option value="GBP"></option>
+    <option value="RON"></option>
+    <option value="CAD"></option>
+    <option value="AUD"></option>
+    <option value="CHF"></option>
+    <option value="JPY"></option>
+    <option value="PLN"></option>
+  </datalist>
+
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
 
@@ -266,7 +279,7 @@
         <label>Location<input name="location" placeholder="City / Country" /></label>
         <label>Salary min<input name="salaryMin" type="number" min="0" placeholder="50000" /></label>
         <label>Salary max<input name="salaryMax" type="number" min="0" placeholder="65000" /></label>
-        <label>Currency<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>RON</option></select></label>
+        <label>Currency<input name="currency" list="currencySuggestions" maxlength="12" placeholder="USD" /></label>
         <label>Source<select name="source"><option>LinkedIn</option><option>Indeed</option><option>Company website</option><option>Referral</option><option>Recruiter</option><option>Networking</option><option>Other</option></select></label>
         <label>Applied date<input name="appliedDate" type="date" /></label>
         <label>Next step date<input name="nextStepDate" type="date" /></label>
@@ -362,7 +375,7 @@
         <input type="hidden" name="id" />
         <label class="span-2">Application<select name="applicationId" id="offerApplicationSelect" required></select></label>
         <label>Base salary<input name="salary" type="number" min="0" /></label>
-        <label>Currency<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>RON</option></select></label>
+        <label>Currency<input name="currency" list="currencySuggestions" maxlength="12" placeholder="USD" /></label>
         <label>Bonus / equity<input name="bonus" placeholder="10% + equity" /></label>
         <label>PTO<input name="pto" placeholder="25 days" /></label>
         <label>Work style<select name="workStyle"><option>Remote</option><option>Hybrid</option><option>On-site</option></select></label>
