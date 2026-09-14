@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#172033" />
+  <meta name="description" content="Job Search & Interview Tracker App — organize applications, interviews, follow-ups, contacts and offers." />
+  <title>Job Search & Interview Tracker</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-wrap">
+        <div class="brand-mark">JT</div>
+        <div>
+          <div class="brand-name">JobTrack</div>
+          <div class="brand-sub">Career command center</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-item active" data-view="dashboard"><span>◫</span><span>Dashboard</span></button>
+        <button class="nav-item" data-view="applications"><span>▦</span><span>Applications</span></button>
+        <button class="nav-item" data-view="pipeline"><span>↦</span><span>Pipeline</span></button>
+        <button class="nav-item" data-view="interviews"><span>◷</span><span>Interviews</span></button>
+        <button class="nav-item" data-view="followups"><span>✓</span><span>Follow-ups</span></button>
+        <button class="nav-item" data-view="companies"><span>⌂</span><span>Companies</span></button>
+        <button class="nav-item" data-view="contacts"><span>◎</span><span>Contacts</span></button>
+        <button class="nav-item" data-view="offers"><span>◇</span><span>Offers</span></button>
+        <button class="nav-item" data-view="analytics"><span>⌁</span><span>Analytics</span></button>
+        <button class="nav-item" data-view="settings"><span>⚙</span><span>Settings</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="demo-card" id="demoCard">
+          <div class="demo-row"><span>Demo usage</span><strong id="demoCounter">Demo 0 / 20</strong></div>
+          <div class="progress"><span id="demoProgress"></span></div>
+          <button class="btn btn-primary btn-block" id="activateBtnSide">Activate full app</button>
+        </div>
+        <div class="privacy-note">Private & local-first<br><span>Your data stays in this browser.</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-btn mobile-only" id="menuBtn" aria-label="Open navigation">☰</button>
+          <div>
+            <h1 id="pageTitle">Dashboard</h1>
+            <p id="pageSubtitle">Your job search at a glance.</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="search-box">
+            <span>⌕</span>
+            <input id="globalSearch" type="search" placeholder="Search jobs, companies, contacts…" />
+          </div>
+          <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">◐</button>
+          <button class="btn btn-install" id="installAppBtn" type="button">↧ Install App</button>
+          <button class="btn btn-primary" id="quickAddBtn">+ Add application</button>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="view active" id="view-dashboard">
+          <div class="welcome-card momentum-hero">
+            <div class="hero-copy">
+              <span class="eyebrow" id="dashboardGreeting">GOOD EVENING</span>
+              <h2>Ready for your next opportunity? 👋</h2>
+              <p>Stay focused on the roles with the strongest fit, keep every next step visible and turn job searching into a clear daily system.</p>
+              <div class="hero-actions">
+                <button class="btn btn-light" data-open-modal="applicationModal">+ New application</button>
+                <button class="btn btn-ghost-light" data-nav="pipeline">Open pipeline →</button>
+              </div>
+            </div>
+            <div class="momentum-panel">
+              <div class="momentum-ring" id="momentumRing" style="--momentum:0"><div><strong id="momentumScore">0</strong><span>Momentum</span></div></div>
+              <div class="momentum-copy"><span>THIS WEEK</span><strong id="momentumHeadline">Build your pipeline</strong><small id="momentumDetail">Your activity summary will appear here.</small></div>
+            </div>
+          </div>
+
+          <div class="stat-grid" id="dashboardStats"></div>
+
+          <div class="dashboard-grid">
+            <div class="card today-card">
+              <div class="card-head">
+                <div><span class="eyebrow">TODAY</span><h3>Priority actions</h3></div>
+                <span class="pill" id="todayCount">0 items</span>
+              </div>
+              <div id="todayList" class="task-list"></div>
+            </div>
+            <div class="card health-card">
+              <div class="card-head"><div><span class="eyebrow">JOB SEARCH HEALTH</span><h3>What needs attention</h3></div><span class="health-score" id="healthScore">—</span></div>
+              <div id="healthList" class="health-list"></div>
+              <div class="smart-suggestion"><span>SMART NEXT MOVE</span><p id="smartSuggestion">Add opportunities to receive a focused suggestion.</p></div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid lower">
+            <div class="card">
+              <div class="card-head"><div><span class="eyebrow">PRIORITY</span><h3>Top opportunities</h3></div><button class="text-btn" data-nav="applications">See applications</button></div>
+              <div id="topMatches" class="list-clean"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><div><span class="eyebrow">PIPELINE</span><h3>Application status</h3></div><button class="text-btn" data-nav="pipeline">Open CRM board</button></div>
+              <div id="pipelineMini" class="mini-pipeline"></div>
+            </div>
+          </div>
+
+          <div class="card dashboard-wide-card">
+            <div class="card-head"><div><span class="eyebrow">UPCOMING</span><h3>Interview runway</h3></div><button class="text-btn" data-nav="interviews">View all interviews</button></div>
+            <div id="upcomingInterviews" class="interview-runway"></div>
+          </div>
+        </div>
+
+        <div class="view" id="view-applications">
+          <div class="section-toolbar">
+            <div class="filter-row">
+              <select id="applicationStatusFilter"><option value="">All statuses</option></select>
+              <select id="applicationPriorityFilter"><option value="">All priorities</option><option>High</option><option>Medium</option><option>Low</option></select>
+            </div>
+            <button class="btn btn-primary" data-open-modal="applicationModal">+ Add application</button>
+          </div>
+          <div class="card table-card">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Role</th><th>Company</th><th>Status</th><th>Priority</th><th>Match</th><th>Applied</th><th>Next step</th><th></th></tr></thead>
+                <tbody id="applicationsTable"></tbody>
+              </table>
+            </div>
+            <div class="empty-state hidden" id="applicationsEmpty">No applications yet. Add your first opportunity.</div>
+          </div>
+        </div>
+
+        <div class="view" id="view-pipeline">
+          <div class="section-toolbar"><p class="section-help">Move an application to the next stage from its card menu.</p><button class="btn btn-primary" data-open-modal="applicationModal">+ Add application</button></div>
+          <div class="kanban" id="pipelineBoard"></div>
+        </div>
+
+        <div class="view" id="view-interviews">
+          <div class="section-toolbar"><div><strong>Interview preparation</strong><p class="section-help">Keep schedule, format, preparation notes and questions together.</p></div><button class="btn btn-primary" data-open-modal="interviewModal">+ Add interview</button></div>
+          <div class="cards-grid" id="interviewsGrid"></div>
+          <div class="empty-state hidden" id="interviewsEmpty">No interviews scheduled yet.</div>
+        </div>
+
+        <div class="view" id="view-followups">
+          <div class="section-toolbar"><div><strong>Follow-up center</strong><p class="section-help">Never miss a recruiter reply, thank-you note or application check-in.</p></div><button class="btn btn-primary" data-open-modal="followupModal">+ Add follow-up</button></div>
+          <div class="card">
+            <div id="followupsList" class="task-list"></div>
+            <div class="empty-state hidden" id="followupsEmpty">No follow-ups yet.</div>
+          </div>
+        </div>
+
+        <div class="view" id="view-companies">
+          <div class="section-toolbar"><div><strong>Company research</strong><p class="section-help">Save culture, benefits, salary context and research notes.</p></div><button class="btn btn-primary" data-open-modal="companyModal">+ Add company</button></div>
+          <div class="cards-grid" id="companiesGrid"></div>
+          <div class="empty-state hidden" id="companiesEmpty">No company research saved yet.</div>
+        </div>
+
+        <div class="view" id="view-contacts">
+          <div class="section-toolbar"><div><strong>Networking CRM</strong><p class="section-help">Recruiters, hiring managers, referrals and useful contacts.</p></div><button class="btn btn-primary" data-open-modal="contactModal">+ Add contact</button></div>
+          <div class="cards-grid" id="contactsGrid"></div>
+          <div class="empty-state hidden" id="contactsEmpty">No contacts saved yet.</div>
+        </div>
+
+        <div class="view" id="view-offers">
+          <div class="section-toolbar"><div><strong>Offer comparison</strong><p class="section-help">Compare compensation, flexibility, benefits and overall fit.</p></div><button class="btn btn-primary" data-open-modal="offerModal">+ Add offer</button></div>
+          <div id="offersCompare" class="offer-grid"></div>
+          <div class="empty-state hidden" id="offersEmpty">No offers to compare yet.</div>
+        </div>
+
+        <div class="view" id="view-analytics">
+          <div class="analytics-grid">
+            <div class="card metric-card"><span>Applications</span><strong id="metricApplications">0</strong><small>Total opportunities tracked</small></div>
+            <div class="card metric-card"><span>Interview rate</span><strong id="metricInterviewRate">0%</strong><small>Applications reaching interview</small></div>
+            <div class="card metric-card"><span>Offer rate</span><strong id="metricOfferRate">0%</strong><small>Applications reaching offer</small></div>
+            <div class="card metric-card"><span>Avg. match</span><strong id="metricMatch">0%</strong><small>Across active applications</small></div>
+          </div>
+          <div class="dashboard-grid lower">
+            <div class="card"><div class="card-head"><div><span class="eyebrow">STATUS</span><h3>Pipeline conversion</h3></div></div><div id="analyticsStatus" class="bar-list"></div></div>
+            <div class="card"><div class="card-head"><div><span class="eyebrow">SOURCES</span><h3>Where opportunities come from</h3></div></div><div id="analyticsSources" class="bar-list"></div></div>
+          </div>
+        </div>
+
+        <div class="view" id="view-settings">
+          <div class="settings-grid">
+            <div class="card settings-card">
+              <span class="eyebrow">APP ACCESS</span><h3>Activation</h3>
+              <p id="activationStatusText">You are using the demo. You can make up to 20 changes.</p>
+              <button class="btn btn-primary" id="activateBtnSettings">Activate full app</button>
+            </div>
+            <div class="card settings-card">
+              <span class="eyebrow">DATA</span><h3>Backup & restore</h3>
+              <p>Export a full local backup or restore one later.</p>
+              <div class="button-row"><button class="btn btn-secondary" id="exportBackupBtn">Export backup</button><label class="btn btn-secondary file-btn">Restore backup<input type="file" id="importBackupInput" accept="application/json" hidden></label></div>
+            </div>
+            <div class="card settings-card">
+              <span class="eyebrow">DEMO CONTENT</span><h3>Sample data</h3>
+              <p>Remove fictional examples without touching records you created yourself.</p>
+              <button class="btn btn-danger-soft" id="clearDemoBtn">Clear demo data</button>
+            </div>
+            <div class="card settings-card install-card">
+              <span class="eyebrow">INSTALL</span><h3>Install JobTrack</h3>
+              <p>Install the app on your computer or phone for faster access and offline use.</p>
+              <button class="btn btn-primary" id="installAppBtnSettings" type="button">↧ Install App</button>
+              <small id="installHint" class="settings-hint">Works best from Chrome, Edge or Safari Add to Home Screen.</small>
+            </div>
+            <div class="card settings-card">
+              <span class="eyebrow">APPEARANCE</span><h3>Theme</h3>
+              <p>Switch between light and dark mode.</p>
+              <button class="btn btn-secondary" id="themeBtnSettings">Toggle light / dark</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+  <div class="modal" id="applicationModal" aria-hidden="true">
+    <div class="modal-panel modal-lg">
+      <div class="modal-head"><div><span class="eyebrow">OPPORTUNITY</span><h3 id="applicationModalTitle">Add application</h3></div><button class="icon-btn modal-close">×</button></div>
+      <form id="applicationForm" class="form-grid">
+        <input type="hidden" name="id" />
+        <label>Job title<input name="role" required placeholder="e.g. Product Designer" /></label>
+        <label>Company<input name="company" required placeholder="e.g. Northstar Labs" /></label>
+        <label>Status<select name="status" id="applicationStatusSelect"></select></label>
+        <label>Priority<select name="priority"><option>High</option><option selected>Medium</option><option>Low</option></select></label>
+        <label>Work style<select name="workStyle"><option>Remote</option><option>Hybrid</option><option>On-site</option></select></label>
+        <label>Location<input name="location" placeholder="City / Country" /></label>
+        <label>Salary min<input name="salaryMin" type="number" min="0" placeholder="50000" /></label>
+        <label>Salary max<input name="salaryMax" type="number" min="0" placeholder="65000" /></label>
+        <label>Currency<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>RON</option></select></label>
+        <label>Source<select name="source"><option>LinkedIn</option><option>Indeed</option><option>Company website</option><option>Referral</option><option>Recruiter</option><option>Networking</option><option>Other</option></select></label>
+        <label>Applied date<input name="appliedDate" type="date" /></label>
+        <label>Next step date<input name="nextStepDate" type="date" /></label>
+        <label class="span-2">Job URL<input name="jobUrl" type="url" placeholder="https://..." /></label>
+        <div class="span-2 match-box">
+          <div class="match-head"><div><strong>Job Match Score</strong><p>Rate what matters to you. We calculate the overall match automatically.</p></div><strong id="matchPreview">75%</strong></div>
+          <div class="score-grid">
+            <label>Role fit<input name="scoreRole" class="score-input" type="range" min="1" max="5" value="4" /></label>
+            <label>Salary<input name="scoreSalary" class="score-input" type="range" min="1" max="5" value="4" /></label>
+            <label>Remote / flexibility<input name="scoreRemote" class="score-input" type="range" min="1" max="5" value="4" /></label>
+            <label>Career growth<input name="scoreGrowth" class="score-input" type="range" min="1" max="5" value="4" /></label>
+            <label>Benefits<input name="scoreBenefits" class="score-input" type="range" min="1" max="5" value="3" /></label>
+            <label>Company interest<input name="scoreCompany" class="score-input" type="range" min="1" max="5" value="4" /></label>
+          </div>
+        </div>
+        <label class="span-2">Notes<textarea name="notes" rows="4" placeholder="Why this role stands out, requirements, resume version, important details…"></textarea></label>
+        <div class="form-actions span-2"><button type="button" class="btn btn-secondary modal-close">Cancel</button><button class="btn btn-primary" type="submit">Save application</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="interviewModal" aria-hidden="true">
+    <div class="modal-panel modal-lg">
+      <div class="modal-head"><div><span class="eyebrow">INTERVIEW</span><h3>Add interview</h3></div><button class="icon-btn modal-close">×</button></div>
+      <form id="interviewForm" class="form-grid">
+        <input type="hidden" name="id" />
+        <label class="span-2">Application<select name="applicationId" id="interviewApplicationSelect" required></select></label>
+        <label>Interview type<select name="type"><option>Recruiter Screen</option><option>Phone Screen</option><option>Hiring Manager</option><option>Technical</option><option>Portfolio</option><option>Panel</option><option>Final Interview</option></select></label>
+        <label>Format<select name="format"><option>Video</option><option>Phone</option><option>In person</option></select></label>
+        <label>Date<input name="date" type="date" required /></label>
+        <label>Time<input name="time" type="time" /></label>
+        <label>Interviewer<input name="interviewer" placeholder="Name" /></label>
+        <label>Meeting link / location<input name="location" placeholder="Zoom / address" /></label>
+        <label class="span-2">Preparation notes<textarea name="prepNotes" rows="4" placeholder="STAR stories, role requirements, key examples…"></textarea></label>
+        <label class="span-2">Questions to ask<textarea name="questions" rows="3" placeholder="Questions for the interviewer…"></textarea></label>
+        <div class="form-actions span-2"><button type="button" class="btn btn-secondary modal-close">Cancel</button><button class="btn btn-primary" type="submit">Save interview</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="followupModal" aria-hidden="true">
+    <div class="modal-panel">
+      <div class="modal-head"><div><span class="eyebrow">FOLLOW-UP</span><h3>Add follow-up</h3></div><button class="icon-btn modal-close">×</button></div>
+      <form id="followupForm" class="form-grid single">
+        <input type="hidden" name="id" />
+        <label>Related application<select name="applicationId" id="followupApplicationSelect"></select></label>
+        <label>Follow-up type<select name="type"><option>Application check-in</option><option>Thank-you note</option><option>Recruiter reply</option><option>Networking follow-up</option><option>Offer follow-up</option><option>Other</option></select></label>
+        <label>Due date<input name="dueDate" type="date" required /></label>
+        <label>Notes<textarea name="notes" rows="4" placeholder="What needs to happen next?"></textarea></label>
+        <div class="form-actions"><button type="button" class="btn btn-secondary modal-close">Cancel</button><button class="btn btn-primary" type="submit">Save follow-up</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="companyModal" aria-hidden="true">
+    <div class="modal-panel modal-lg">
+      <div class="modal-head"><div><span class="eyebrow">RESEARCH</span><h3>Add company</h3></div><button class="icon-btn modal-close">×</button></div>
+      <form id="companyForm" class="form-grid">
+        <input type="hidden" name="id" />
+        <label>Company name<input name="name" required /></label>
+        <label>Industry<input name="industry" /></label>
+        <label>Website<input name="website" type="url" placeholder="https://..." /></label>
+        <label>Size<input name="size" placeholder="e.g. 200–500" /></label>
+        <label>Culture score<select name="culture"><option value="5">5 — Excellent</option><option value="4">4 — Strong</option><option value="3" selected>3 — Neutral</option><option value="2">2 — Concerns</option><option value="1">1 — Poor fit</option></select></label>
+        <label>Benefits<input name="benefits" placeholder="Health, PTO, remote…" /></label>
+        <label class="span-2">Research notes<textarea name="notes" rows="5"></textarea></label>
+        <div class="form-actions span-2"><button type="button" class="btn btn-secondary modal-close">Cancel</button><button class="btn btn-primary" type="submit">Save company</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="contactModal" aria-hidden="true">
+    <div class="modal-panel">
+      <div class="modal-head"><div><span class="eyebrow">CONTACT</span><h3>Add contact</h3></div><button class="icon-btn modal-close">×</button></div>
+      <form id="contactForm" class="form-grid single">
+        <input type="hidden" name="id" />
+        <label>Name<input name="name" required /></label>
+        <label>Role<input name="role" placeholder="Recruiter / Hiring Manager" /></label>
+        <label>Company<input name="company" /></label>
+        <label>Email<input name="email" type="email" /></label>
+        <label>LinkedIn / profile URL<input name="url" type="url" /></label>
+        <label>Last contact<input name="lastContact" type="date" /></label>
+        <label>Notes<textarea name="notes" rows="4"></textarea></label>
+        <div class="form-actions"><button type="button" class="btn btn-secondary modal-close">Cancel</button><button class="btn btn-primary" type="submit">Save contact</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="offerModal" aria-hidden="true">
+    <div class="modal-panel modal-lg">
+      <div class="modal-head"><div><span class="eyebrow">OFFER</span><h3>Add offer</h3></div><button class="icon-btn modal-close">×</button></div>
+      <form id="offerForm" class="form-grid">
+        <input type="hidden" name="id" />
+        <label class="span-2">Application<select name="applicationId" id="offerApplicationSelect" required></select></label>
+        <label>Base salary<input name="salary" type="number" min="0" /></label>
+        <label>Currency<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>RON</option></select></label>
+        <label>Bonus / equity<input name="bonus" placeholder="10% + equity" /></label>
+        <label>PTO<input name="pto" placeholder="25 days" /></label>
+        <label>Work style<select name="workStyle"><option>Remote</option><option>Hybrid</option><option>On-site</option></select></label>
+        <label>Decision deadline<input name="deadline" type="date" /></label>
+        <label>Overall score<input name="score" type="range" min="1" max="10" value="8" /></label>
+        <label>Benefits<input name="benefits" placeholder="Health, pension, learning budget…" /></label>
+        <label class="span-2">Notes<textarea name="notes" rows="4"></textarea></label>
+        <div class="form-actions span-2"><button type="button" class="btn btn-secondary modal-close">Cancel</button><button class="btn btn-primary" type="submit">Save offer</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="activateModal" aria-hidden="true">
+    <div class="modal-panel small-panel">
+      <div class="modal-head"><div><span class="eyebrow">FULL ACCESS</span><h3>Activate JobTrack</h3></div><button class="icon-btn modal-close">×</button></div>
+      <p class="modal-copy">Enter the activation code included with your purchase. Activation is stored locally in this browser.</p>
+      <form id="activationForm" class="single-form">
+        <label>Activation code<input name="code" autocomplete="off" placeholder="Enter code" required /></label>
+        <div class="form-actions"><button type="button" class="btn btn-secondary modal-close">Cancel</button><button class="btn btn-primary" type="submit">Activate</button></div>
+      </form>
+      <p class="form-error" id="activationError"></p>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmModal" aria-hidden="true">
+    <div class="modal-panel small-panel">
+      <div class="modal-head"><div><span class="eyebrow">CONFIRM</span><h3 id="confirmTitle">Delete record?</h3></div><button class="icon-btn modal-close">×</button></div>
+      <p class="modal-copy" id="confirmText">This action cannot be undone.</p>
+      <div class="form-actions"><button class="btn btn-secondary modal-close">Cancel</button><button class="btn btn-danger" id="confirmActionBtn">Delete</button></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
