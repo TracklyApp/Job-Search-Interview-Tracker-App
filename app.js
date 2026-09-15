@@ -18,6 +18,7 @@
     contacts: ['Contacts', 'Build a lightweight networking CRM.'],
     offers: ['Offers', 'Compare compensation and overall fit.'],
     analytics: ['Analytics', 'Understand what is working in your job search.'],
+    howto: ['How to Use', 'Quick-start guidance and the complete JobTrack User Manual.'],
     settings: ['Settings', 'Profile, activation, backup and appearance.']
   };
 
@@ -377,6 +378,8 @@
     $('#themeBtnSettings').addEventListener('click', toggleTheme);
     $('#installAppBtn').addEventListener('click', installApp);
     $('#installAppBtnSettings').addEventListener('click', installApp);
+    const installGuideBtn = $('#installAppBtnGuide');
+    if (installGuideBtn) installGuideBtn.addEventListener('click', installApp);
     $('#globalSearch').addEventListener('input', e => {
       searchTerm = e.target.value.trim().toLowerCase();
       renderApplications(); renderCompanies(); renderContacts(); renderInterviews();
@@ -766,18 +769,19 @@
 
   function updateInstallUI() {
     const installed = isStandalone();
-    const buttons = [$('#installAppBtn'), $('#installAppBtnSettings')].filter(Boolean);
+    const buttons = [$('#installAppBtn'), $('#installAppBtnSettings'), $('#installAppBtnGuide')].filter(Boolean);
     buttons.forEach(btn => {
       btn.disabled = installed;
       btn.textContent = installed ? '✓ App Installed' : '↧ Install App';
       btn.classList.toggle('installed', installed);
     });
-    const hint = $('#installHint');
-    if (!hint) return;
-    if (installed) hint.textContent = 'JobTrack is installed and can run like a standalone app.';
-    else if (/iphone|ipad|ipod/i.test(navigator.userAgent)) hint.textContent = 'On iPhone/iPad: Safari → Share → Add to Home Screen.';
-    else if (location.protocol === 'file:') hint.textContent = 'Install becomes available when the app is opened from HTTPS or localhost.';
-    else hint.textContent = deferredInstallPrompt ? 'Ready to install on this device.' : 'If no prompt appears, use your browser menu → Install app / Add to Home Screen.';
+    const hints = [$('#installHint'), $('#installHintGuide')].filter(Boolean);
+    let hintText = '';
+    if (installed) hintText = 'JobTrack is installed and can run like a standalone app.';
+    else if (/iphone|ipad|ipod/i.test(navigator.userAgent)) hintText = 'On iPhone/iPad: Safari → Share → Add to Home Screen.';
+    else if (location.protocol === 'file:') hintText = 'Install becomes available when the app is opened from HTTPS or localhost.';
+    else hintText = deferredInstallPrompt ? 'Ready to install on this device.' : 'If no prompt appears, use your browser menu → Install app / Add to Home Screen.';
+    hints.forEach(hint => hint.textContent = hintText);
   }
 
   async function installApp() {

@@ -30,6 +30,7 @@
         <button class="nav-item" data-view="contacts"><span>◎</span><span>Contacts</span></button>
         <button class="nav-item" data-view="offers"><span>◇</span><span>Offers</span></button>
         <button class="nav-item" data-view="analytics"><span>⌁</span><span>Analytics</span></button>
+        <button class="nav-item" data-view="howto"><span>?</span><span>How to Use</span></button>
         <button class="nav-item" data-view="settings"><span>⚙</span><span>Settings</span></button>
       </nav>
 
@@ -192,6 +193,65 @@
           </div>
         </div>
 
+        <div class="view" id="view-howto">
+          <div class="howto-hero card">
+            <div class="howto-hero-copy">
+              <span class="eyebrow">HOW TO USE JOBTRACK</span>
+              <h2>From first application to final offer — one clear workflow.</h2>
+              <p>Use this page as your quick-start guide. For every field, feature and troubleshooting step, open the complete PDF User Manual included with the app.</p>
+              <div class="button-row howto-actions">
+                <a class="btn btn-primary" href="JobTrack_User_Manual.pdf" target="_blank" rel="noopener">Open Full User Manual</a>
+                <a class="btn btn-secondary" href="JobTrack_User_Manual.pdf" download>Download PDF Manual</a>
+                <button class="btn btn-install" id="installAppBtnGuide" type="button">↧ Install App</button>
+              </div>
+              <small class="settings-hint" id="installHintGuide">Install JobTrack for faster access and offline use.</small>
+            </div>
+            <div class="manual-badge" aria-hidden="true">
+              <span>PDF</span><strong>USER<br>MANUAL</strong><small>Included</small>
+            </div>
+          </div>
+
+          <div class="howto-grid">
+            <article class="card howto-step"><span class="step-number">1</span><div><span class="eyebrow">SET UP</span><h3>Create your profile</h3><p>Open Settings and add your name, target role, preferred work type, target salary and currency. USD is the default currency, but you can type any currency manually.</p><button class="text-btn" data-nav="settings">Open Settings →</button></div></article>
+            <article class="card howto-step"><span class="step-number">2</span><div><span class="eyebrow">CAPTURE</span><h3>Add every opportunity</h3><p>Save the role, company, salary range, work style, source, status, priority, dates, notes and job URL. Use the six fit ratings to create a Job Match Score.</p><button class="text-btn" data-nav="applications">Open Applications →</button></div></article>
+            <article class="card howto-step"><span class="step-number">3</span><div><span class="eyebrow">MOVE FORWARD</span><h3>Keep the Pipeline current</h3><p>Move each opportunity through Saved, Applied, Screening, Interview, Final Interview and Offer. Keep a next-step date so promising roles never go quiet.</p><button class="text-btn" data-nav="pipeline">Open Pipeline →</button></div></article>
+            <article class="card howto-step"><span class="step-number">4</span><div><span class="eyebrow">PREPARE</span><h3>Plan interviews</h3><p>Add interview type, date, time, format, interviewer and location. Store preparation notes and questions you want to ask in the same record.</p><button class="text-btn" data-nav="interviews">Open Interviews →</button></div></article>
+            <article class="card howto-step"><span class="step-number">5</span><div><span class="eyebrow">FOLLOW THROUGH</span><h3>Schedule follow-ups</h3><p>Create recruiter check-ins, thank-you notes, preparation tasks and other reminders. Mark them complete as you work through your daily priorities.</p><button class="text-btn" data-nav="followups">Open Follow-ups →</button></div></article>
+            <article class="card howto-step"><span class="step-number">6</span><div><span class="eyebrow">RESEARCH</span><h3>Build context and relationships</h3><p>Keep company research in Companies and useful recruiters, hiring managers and referrals in Contacts. This turns JobTrack into a lightweight career CRM.</p><div class="howto-link-row"><button class="text-btn" data-nav="companies">Companies →</button><button class="text-btn" data-nav="contacts">Contacts →</button></div></div></article>
+            <article class="card howto-step"><span class="step-number">7</span><div><span class="eyebrow">DECIDE</span><h3>Compare offers</h3><p>Record salary, bonus, PTO, benefits, flexibility, decision deadline and overall score. Compare opportunities side by side before making a final decision.</p><button class="text-btn" data-nav="offers">Open Offers →</button></div></article>
+            <article class="card howto-step"><span class="step-number">8</span><div><span class="eyebrow">LEARN</span><h3>Review Analytics</h3><p>Check interview rate, offer rate, average match score, pipeline conversion and opportunity sources to see what is working in your search.</p><button class="text-btn" data-nav="analytics">Open Analytics →</button></div></article>
+          </div>
+
+          <div class="dashboard-grid lower howto-bottom">
+            <div class="card">
+              <div class="card-head"><div><span class="eyebrow">DAILY ROUTINE</span><h3>A simple 5-minute check-in</h3></div></div>
+              <div class="howto-checklist">
+                <div><span>✓</span><p><strong>Dashboard:</strong> review Today’s Priority Actions and Smart Next Move.</p></div>
+                <div><span>✓</span><p><strong>Pipeline:</strong> update stages and next-step dates.</p></div>
+                <div><span>✓</span><p><strong>Follow-ups:</strong> complete anything due today.</p></div>
+                <div><span>✓</span><p><strong>Interviews:</strong> prepare for the next scheduled conversation.</p></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><div><span class="eyebrow">KEEP YOUR DATA SAFE</span><h3>Backup regularly</h3></div></div>
+              <p class="howto-copy">JobTrack is local-first. Export a backup from Settings after important updates to your job search. Restoring a backup replaces the current tracker data with the data stored in that file.</p>
+              <button class="btn btn-secondary" data-nav="settings">Backup & Restore →</button>
+            </div>
+          </div>
+
+          <div class="card manual-inline-card">
+            <div>
+              <span class="eyebrow">COMPLETE DOCUMENTATION</span>
+              <h3>JobTrack User Manual</h3>
+              <p>The full detailed manual is bundled with the application, so customers can open it directly from JobTrack or keep a PDF copy on their device.</p>
+            </div>
+            <div class="button-row">
+              <a class="btn btn-primary" href="JobTrack_User_Manual.pdf" target="_blank" rel="noopener">Open Manual</a>
+              <a class="btn btn-secondary" href="JobTrack_User_Manual.pdf" download>Download Manual</a>
+            </div>
+          </div>
+        </div>
+
         <div class="view" id="view-settings">
           <div class="settings-grid">
             <div class="card settings-card profile-settings-card">
@@ -238,6 +298,11 @@
               <p>Install the app on your computer or phone for faster access and offline use.</p>
               <button class="btn btn-primary" id="installAppBtnSettings" type="button">↧ Install App</button>
               <small id="installHint" class="settings-hint">Works best from Chrome, Edge or Safari Add to Home Screen.</small>
+            </div>
+            <div class="card settings-card manual-settings-card">
+              <span class="eyebrow">HELP</span><h3>User Manual & How to Use</h3>
+              <p>Open the in-app quick guide or the complete PDF User Manual included with JobTrack.</p>
+              <div class="button-row"><button class="btn btn-secondary" data-nav="howto">How to Use</button><a class="btn btn-secondary" href="JobTrack_User_Manual.pdf" target="_blank" rel="noopener">Open Manual</a></div>
             </div>
             <div class="card settings-card">
               <span class="eyebrow">APPEARANCE</span><h3>Theme</h3>
