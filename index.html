@@ -144,8 +144,10 @@
         </div>
 
         <div class="view" id="view-pipeline">
-          <div class="section-toolbar"><p class="section-help">Move an application to the next stage from its card menu.</p><button class="btn btn-primary" data-open-modal="applicationModal">+ Add application</button></div>
-          <div class="kanban" id="pipelineBoard"></div>
+          <div class="section-toolbar"><div><strong>Pipeline focus</strong><p class="section-help">A clear stage-by-stage view with no horizontal scrolling. Keep every role actionable and move it forward when the process changes.</p></div><button class="btn btn-primary" data-open-modal="applicationModal">+ Add application</button></div>
+          <div class="pipeline-kpis" id="pipelineOverview"></div>
+          <div class="pipeline-stage-grid" id="pipelineBoard"></div>
+          <div class="pipeline-outcomes" id="pipelineOutcomes"></div>
         </div>
 
         <div class="view" id="view-interviews">

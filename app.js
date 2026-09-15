@@ -7,6 +7,14 @@
   const ACTIVATION_HASH = '2fc306dad52ecd9aac81643782c19f67d98cfb7863a2585177a25bf87ccdd74e';
   const STATUSES = ['Saved', 'Applied', 'Screening', 'Interview', 'Final Interview', 'Offer', 'Hired', 'Rejected', 'Withdrawn'];
   const PIPELINE_STATUSES = ['Saved', 'Applied', 'Screening', 'Interview', 'Final Interview', 'Offer'];
+  const PIPELINE_STAGE_META = {
+    'Saved': { step:'01', description:'Shortlist the roles worth pursuing.' },
+    'Applied': { step:'02', description:'Submitted roles waiting for a reply.' },
+    'Screening': { step:'03', description:'Early conversations and recruiter review.' },
+    'Interview': { step:'04', description:'Active interviews and preparation.' },
+    'Final Interview': { step:'05', description:'Late-stage roles close to a decision.' },
+    'Offer': { step:'06', description:'Offers ready for comparison and decisions.' }
+  };
 
   const pageMeta = {
     dashboard: ['Dashboard', 'Your job search at a glance.'],
@@ -628,10 +636,34 @@
   }
 
   function renderPipeline() {
+    const activeApps = state.applications.filter(a => PIPELINE_STATUSES.includes(a.status));
+    const interviewStages = ['Screening','Interview','Final Interview'];
+    const needsFollowup = activeApps.filter(a => a.nextStepDate && a.nextStepDate <= isoToday).length;
+    const overview=$('#pipelineOverview');
     const board=$('#pipelineBoard');
-    board.innerHTML=PIPELINE_STATUSES.map(status=>{
-      const apps=state.applications.filter(a=>a.status===status);
-      return `<section class="kanban-col kanban-${statusClass(status)}"><div class="kanban-head"><strong>${escapeHTML(status)}</strong><span class="kanban-count">${apps.length}</span></div><div class="kanban-stack">${apps.map(a=>`<div class="kanban-card"><div class="kanban-company-row"><div class="company-avatar small">${escapeHTML((a.company||'?').trim().charAt(0).toUpperCase())}</div><span class="priority-dot priority-dot-${escapeHTML(a.priority||'Medium')}"></span></div><h4>${escapeHTML(a.role)}</h4><p>${escapeHTML(a.company)} · ${escapeHTML(a.workStyle||'')}</p><div class="kanban-next">${a.nextStepDate?`Next: ${humanDate(a.nextStepDate)}`:'No next date set'}</div><div class="kanban-meta">${matchBadge(matchScore(a))}<select class="kanban-select" data-pipeline-status="${a.id}">${STATUSES.map(s=>`<option ${s===a.status?'selected':''}>${escapeHTML(s)}</option>`).join('')}</select></div></div>`).join('') || '<div class="empty-state" style="padding:20px 6px">No roles</div>'}</div></section>`;
+    const outcomes=$('#pipelineOutcomes');
+
+    overview.innerHTML = [
+      ['Active roles', activeApps.length, 'Opportunities still moving through your search.'],
+      ['Interview stages', activeApps.filter(a=>interviewStages.includes(a.status)).length, 'Screening, interview and final interview roles.'],
+      ['Offers', activeApps.filter(a=>a.status==='Offer').length, 'Roles currently at decision stage.'],
+      ['Needs attention', needsFollowup, needsFollowup ? 'Next-step dates due today or earlier.' : 'No overdue next steps right now.']
+    ].map(([label,value,detail])=>`<div class="pipeline-kpi"><span>${escapeHTML(label)}</span><strong>${value}</strong><small>${escapeHTML(detail)}</small></div>`).join('');
+
+    board.innerHTML = PIPELINE_STATUSES.map(status => {
+      const meta = PIPELINE_STAGE_META[status];
+      const apps = state.applications.filter(a=>a.status===status).sort((a,b)=>{
+        const ad=a.nextStepDate||'9999-12-31', bd=b.nextStepDate||'9999-12-31';
+        return ad.localeCompare(bd) || (b.createdAt||0)-(a.createdAt||0);
+      });
+      return `<section class="pipeline-stage kanban-${statusClass(status)}"><div class="pipeline-stage-head"><div class="pipeline-stage-title"><span class="stage-index">STAGE ${meta.step}</span><h3>${escapeHTML(status)}</h3><p>${escapeHTML(meta.description)}</p></div><div class="pipeline-stage-count">${apps.length}</div></div><div class="pipeline-role-list">${apps.map(a=>`<article class="pipeline-role"><div class="company-avatar small">${escapeHTML((a.company||'?').trim().charAt(0).toUpperCase())}</div><div class="pipeline-role-main"><strong>${escapeHTML(a.role)}</strong><small>${escapeHTML(a.company)}${a.workStyle?` · ${escapeHTML(a.workStyle)}`:''}${a.location?` · ${escapeHTML(a.location)}`:''}</small><div class="pipeline-role-meta">${matchBadge(matchScore(a))}<span class="priority-badge priority-${escapeHTML(a.priority||'Medium')}">${escapeHTML(a.priority||'Medium')}</span><span class="pipeline-next-pill">${a.nextStepDate?`Next: ${humanDate(a.nextStepDate)}`:'Add next step'}</span></div></div><div class="pipeline-role-actions"><select class="kanban-select" data-pipeline-status="${a.id}">${STATUSES.map(s=>`<option ${s===a.status?'selected':''}>${escapeHTML(s)}</option>`).join('')}</select><button class="mini-btn" data-edit="${a.id}" data-type="application">Edit</button></div></article>`).join('') || '<div class="pipeline-empty-note">No roles in this stage yet.</div>'}</div></section>`;
+    }).join('');
+
+    const terminalStatuses = ['Hired','Rejected','Withdrawn'];
+    outcomes.innerHTML = terminalStatuses.map(status => {
+      const items = state.applications.filter(a=>a.status===status).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+      const description = status==='Hired' ? 'Successful outcomes and accepted roles.' : status==='Rejected' ? 'Closed opportunities that did not move forward.' : 'Roles you decided not to pursue.';
+      return `<div class="outcome-card"><div class="outcome-top"><div><span class="eyebrow">OUTCOME</span><h3>${escapeHTML(status)}</h3><p>${description}</p></div><strong class="outcome-total">${items.length}</strong></div><div class="outcome-list">${items.slice(0,3).map(a=>`<div class="outcome-item"><div><strong>${escapeHTML(a.role)}</strong><small>${escapeHTML(a.company)}</small></div>${matchBadge(matchScore(a))}</div>`).join('') || '<div class="pipeline-empty-note">No roles here yet.</div>'}</div>${items.length>3?`<div class="outcome-note">+ ${items.length-3} more in Applications.</div>`:''}</div>`;
     }).join('');
   }
 
